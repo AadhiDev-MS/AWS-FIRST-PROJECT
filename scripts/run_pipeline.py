@@ -10,7 +10,6 @@ import argparse
 import pandas as pd
 import mlflow
 import mlflow.sklearn
-from posthog import project_root
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
     classification_report, precision_score, recall_score,
@@ -37,7 +36,8 @@ def main(args):
     # === MLflow Setup - ESSENTIAL for experiment tracking ===
     # Configure MLflow to use local file-based tracking (not a tracking server)
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    mlruns_path = args.mlflow_uri or f"file://{project_root}/mlruns"  # Local file-based tracking
+    import pathlib
+    mlruns_path = args.mlflow_uri or pathlib.Path(project_root).joinpath("mlruns").as_uri()  # Local file-based tracking
     mlflow.set_tracking_uri(mlruns_path)
     mlflow.set_experiment(args.experiment)  # Creates experiment if doesn't exist
 
@@ -207,6 +207,26 @@ def main(args):
             artifact_path="model"  # This creates a 'model/' folder in MLflow run artifacts
         )
         print("✅ Model saved to MLflow for serving pipeline")
+
+        # === CRITICAL: Export for Docker ===
+        print("📁 Exporting model artifacts for Docker...")
+        prod_dir = os.path.join(project_root, "models", "production")
+        if os.path.exists(prod_dir):
+            import shutil
+            shutil.rmtree(prod_dir)
+        os.makedirs(prod_dir)
+        
+        # Save model directly to production dir
+        mlflow.sklearn.save_model(model, os.path.join(prod_dir, "model"))
+        
+        # Copy artifacts
+        import shutil
+        shutil.copy(os.path.join(artifacts_dir, "preprocessing.pkl"), os.path.join(prod_dir, "preprocessing.pkl"))
+        
+        with open(os.path.join(prod_dir, "feature_columns.txt"), "w") as f:
+            f.write("\n".join(feature_cols))
+            
+        print(f"✅ Exported artifacts to {prod_dir}")
 
         # === Final Performance Summary ===
         print(f"\n⏱️  Performance Summary:")
