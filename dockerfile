@@ -7,8 +7,9 @@ WORKDIR /app
 # 3. Copy only dependency file first (for Docker caching)
 COPY requirements.txt .
 
-# 4. Install Python dependencies (add curl if you use MLflow local tracking URI)
-RUN pip install --upgrade pip \
+# 4. Install system dependencies (libgomp1 is REQUIRED for XGBoost) and Python dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \
+    && pip install --upgrade pip \
     && pip install -r requirements.txt \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
