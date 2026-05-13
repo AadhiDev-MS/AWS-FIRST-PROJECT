@@ -1,2 +1,11 @@
 data/
 notebooks/
+mlruns/
+.git/
+.github/
+.gradio/
+__pycache__/
+*.pyc
+.DS_Store
+CLAUDE.md
+README.md

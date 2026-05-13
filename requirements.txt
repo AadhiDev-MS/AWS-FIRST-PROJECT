@@ -1,10 +1,10 @@
 fastapi
 pydantic
-gradio==4.44.1
+gradio>=4.44.1
 pandas
 numpy
-xgboost==3.0.3
-scikit-learn==1.5.2
+xgboost
+scikit-learn==1.7.2
 mlflow
 great_expectations
 uvicorn

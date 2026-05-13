@@ -16,19 +16,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \
 # 5. Copy the entire project into the image
 COPY . .
 
-# Copy exported model artifacts from the pipeline output
+# 6. Copy exported model artifacts to the path expected by inference.py
+#    inference.py looks for the model at /app/model and feature_columns.txt at /app/model/
 COPY models/production/model /app/model
 COPY models/production/feature_columns.txt /app/model/feature_columns.txt
-COPY models/production/preprocessing.pkl /app/model/preprocessing.pkl
 
-# make "serving" and "app" importable without the "src." prefix
-# ensures logs are shown in real-time (no buffering).
-# lets you import modules using from app... instead of from src.app....
-ENV PYTHONUNBUFFERED=1 \ 
+# 7. Environment configuration
+#    PYTHONUNBUFFERED=1 ensures logs are shown in real-time (no buffering)
+#    PYTHONPATH=/app/src lets you import modules using from serving... instead of from src.serving...
+ENV PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app/src
 
-# 6. Expose FastAPI port
+# 8. Expose FastAPI port
 EXPOSE 8000
 
-# 7. Run the FastAPI app using uvicorn (change path if needed)
+# 9. Run the FastAPI app using uvicorn
 CMD ["python", "-m", "uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "8000"]

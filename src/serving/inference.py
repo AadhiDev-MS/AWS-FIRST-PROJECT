@@ -32,15 +32,25 @@ import mlflow
 # IMPORTANT: This path is set during Docker container build
 # In development: uses local MLflow artifacts
 # In production: uses model copied to container at build time
-MODEL_DIR = "/app/model"
+# Auto-detect: use /app/model in Docker, local path otherwise
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+_LOCAL_MODEL_DIR = os.path.join(_PROJECT_ROOT, "models", "production", "model")
+
+if os.path.isdir("/app/model"):
+    MODEL_DIR = "/app/model"
+elif os.path.isdir(_LOCAL_MODEL_DIR):
+    MODEL_DIR = _LOCAL_MODEL_DIR
+    print(f"[LOCAL] Development mode: using model from {MODEL_DIR}")
+else:
+    MODEL_DIR = "/app/model"  # fallback, will trigger the exception handler below
 
 try:
     # Load the trained XGBoost model in MLflow pyfunc format
     # This ensures compatibility regardless of the underlying ML library
     model = mlflow.pyfunc.load_model(MODEL_DIR)
-    print(f"✅ Model loaded successfully from {MODEL_DIR}")
+    print(f"[OK] Model loaded successfully from {MODEL_DIR}")
 except Exception as e:
-    print(f"❌ Failed to load model from {MODEL_DIR}: {e}")
+    print(f"[ERROR] Failed to load model from {MODEL_DIR}: {e}")
     # Fallback for local development (OPTIONAL)
     try:
         # Try loading from local MLflow tracking
@@ -50,7 +60,7 @@ except Exception as e:
             latest_model = max(local_model_paths, key=os.path.getmtime)
             model = mlflow.pyfunc.load_model(latest_model)
             MODEL_DIR = latest_model
-            print(f"✅ Fallback: Loaded model from {latest_model}")
+            print(f"[OK] Fallback: Loaded model from {latest_model}")
         else:
             raise Exception("No model found in local mlruns")
     except Exception as fallback_error:
@@ -61,9 +71,12 @@ except Exception as e:
 # This ensures the model receives features in the expected order
 try:
     feature_file = os.path.join(MODEL_DIR, "feature_columns.txt")
+    # In local dev, feature_columns.txt might be in the parent dir of model/
+    if not os.path.isfile(feature_file):
+        feature_file = os.path.join(os.path.dirname(MODEL_DIR), "feature_columns.txt")
     with open(feature_file) as f:
         FEATURE_COLS = [ln.strip() for ln in f if ln.strip()]
-    print(f"✅ Loaded {len(FEATURE_COLS)} feature columns from training")
+    print(f"[OK] Loaded {len(FEATURE_COLS)} feature columns from {feature_file}")
 except Exception as e:
     raise Exception(f"Failed to load feature columns: {e}")
 
