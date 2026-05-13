@@ -16,6 +16,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import gradio as gr
+import pandas as pd
 import os
 from src.serving.inference import predict  # Core ML inference logic
 
