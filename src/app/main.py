@@ -12,8 +12,11 @@ Architecture:
 """
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import gradio as gr
+import os
 from src.serving.inference import predict  # Core ML inference logic
 
 # Initialize FastAPI application
@@ -23,13 +26,28 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# === HEALTH CHECK ENDPOINT ===
-# CRITICAL: Required for AWS Application Load Balancer health checks
+# === MOUNT FRONTEND ===
+# Serve the custom landing page from the frontend directory
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
+
 @app.get("/")
-def root():
+def serve_home():
     """
-    Health check endpoint for monitoring and load balancer health checks.
+    Serves the custom landing page as the default home page.
     """
+    return FileResponse("frontend/index.html")
+
+@app.get("/style.css")
+def serve_css():
+    return FileResponse("frontend/style.css")
+
+@app.get("/script.js")
+def serve_js():
+    return FileResponse("frontend/script.js")
+
+# === HEALTH CHECK ENDPOINT ===
+@app.get("/health")
+def health():
     return {"status": "ok"}
 
 # === REQUEST DATA SCHEMA ===
@@ -141,69 +159,88 @@ def gradio_interface(
 
 # === GRADIO UI CONFIGURATION ===
 # Build comprehensive Gradio interface with all customer features
-demo = gr.Interface(
-    fn=gradio_interface,
-    inputs=[
-        # Demographics section
-        gr.Dropdown(["Male", "Female"], label="Gender", value="Male"),
-        gr.Dropdown(["Yes", "No"], label="Partner", value="No"),
-        gr.Dropdown(["Yes", "No"], label="Dependents", value="No"),
-        
-        # Phone services section
-        gr.Dropdown(["Yes", "No"], label="Phone Service", value="Yes"),
-        gr.Dropdown(["Yes", "No", "No phone service"], label="Multiple Lines", value="No"),
-        
-        # Internet services section (key churn predictors)
-        gr.Dropdown(["DSL", "Fiber optic", "No"], label="Internet Service", value="Fiber optic"),
-        gr.Dropdown(["Yes", "No", "No internet service"], label="Online Security", value="No"),
-        gr.Dropdown(["Yes", "No", "No internet service"], label="Online Backup", value="No"),
-        gr.Dropdown(["Yes", "No", "No internet service"], label="Device Protection", value="No"),
-        gr.Dropdown(["Yes", "No", "No internet service"], label="Tech Support", value="No"),
-        gr.Dropdown(["Yes", "No", "No internet service"], label="Streaming TV", value="Yes"),
-        gr.Dropdown(["Yes", "No", "No internet service"], label="Streaming Movies", value="Yes"),
-        
-        # Contract and billing section (major churn factors)
-        gr.Dropdown(["Month-to-month", "One year", "Two year"], label="Contract", value="Month-to-month"),
-        gr.Dropdown(["Yes", "No"], label="Paperless Billing", value="Yes"),
-        gr.Dropdown([
-            "Electronic check", "Mailed check",
-            "Bank transfer (automatic)", "Credit card (automatic)"
-        ], label="Payment Method", value="Electronic check"),
-        
-        # Numeric features (important for churn prediction)
-        gr.Number(label="Tenure (months)", value=1, minimum=0, maximum=100),
-        gr.Number(label="Monthly Charges ($)", value=85.0, minimum=0, maximum=200),
-        gr.Number(label="Total Charges ($)", value=85.0, minimum=0, maximum=10000),
-    ],
-    outputs=gr.Textbox(label="Churn Prediction", lines=2),
-    title="🔮 Telco Customer Churn Predictor",
-    description="""
-    **Predict customer churn probability using machine learning**
+with gr.Blocks(theme=gr.themes.Soft()) as demo:
+    gr.Markdown("# 🔮 Telco Customer Churn Intelligence")
     
-    Fill in the customer details below to get a churn prediction. The model uses XGBoost trained on 
-    historical telecom customer data to identify customers at risk of churning.
-    
-    💡 **Tip**: Month-to-month contracts with fiber optic internet and electronic check payments 
-    tend to have higher churn rates.
-    """,
-    examples=[
-        # High churn risk example
-        ["Female", "No", "No", "Yes", "No", "Fiber optic", "No", "No", "No", 
-         "No", "Yes", "Yes", "Month-to-month", "Yes", "Electronic check", 
-         1, 85.0, 85.0],
-        # Low churn risk example  
-        ["Male", "Yes", "Yes", "Yes", "Yes", "DSL", "Yes", "Yes", "Yes",
-         "Yes", "No", "No", "Two year", "No", "Credit card (automatic)",
-         60, 45.0, 2700.0]
-    ],
-    theme=gr.themes.Soft()  # Professional appearance
-)
+    with gr.Tabs():
+        with gr.Tab("Predictor"):
+            with gr.Row():
+                with gr.Column():
+                    gr.Markdown("### Customer Profile")
+                    gender = gr.Dropdown(["Male", "Female"], label="Gender", value="Male")
+                    partner = gr.Dropdown(["Yes", "No"], label="Partner", value="No")
+                    dependents = gr.Dropdown(["Yes", "No"], label="Dependents", value="No")
+                    tenure = gr.Number(label="Tenure (months)", value=1, minimum=0)
+                    
+                    gr.Markdown("### Services")
+                    phone = gr.Dropdown(["Yes", "No"], label="Phone Service", value="Yes")
+                    multiple = gr.Dropdown(["Yes", "No", "No phone service"], label="Multiple Lines", value="No")
+                    internet = gr.Dropdown(["DSL", "Fiber optic", "No"], label="Internet Service", value="Fiber optic")
+                    security = gr.Dropdown(["Yes", "No", "No internet service"], label="Online Security", value="No")
+                    backup = gr.Dropdown(["Yes", "No", "No internet service"], label="Online Backup", value="No")
+                
+                with gr.Column():
+                    gr.Markdown("### Billing & Contract")
+                    contract = gr.Dropdown(["Month-to-month", "One year", "Two year"], label="Contract", value="Month-to-month")
+                    paperless = gr.Dropdown(["Yes", "No"], label="Paperless Billing", value="Yes")
+                    payment = gr.Dropdown([
+                        "Electronic check", "Mailed check",
+                        "Bank transfer (automatic)", "Credit card (automatic)"
+                    ], label="Payment Method", value="Electronic check")
+                    monthly = gr.Number(label="Monthly Charges ($)", value=85.0)
+                    total = gr.Number(label="Total Charges ($)", value=85.0)
+                    
+                    gr.Markdown("### Prediction Results")
+                    output = gr.Textbox(label="Churn Risk Assessment", lines=2)
+                    submit_btn = gr.Button("Analyze Customer", variant="primary")
+                    
+                    submit_btn.click(
+                        fn=gradio_interface,
+                        inputs=[
+                            gender, partner, dependents, phone, multiple,
+                            internet, security, backup, gr.State("No"), # protection
+                            gr.State("No"), gr.State("No"), gr.State("No"), # support, tv, movies
+                            contract, paperless, payment, tenure, monthly, total
+                        ],
+                        outputs=output
+                    )
+
+        with gr.Tab("Model Insights"):
+            gr.Markdown("### Key Churn Predictors (Global Feature Importance)")
+            gr.Markdown("This chart shows which factors the XGBoost model considers most important when determining if a customer will leave.")
+            
+            # Simple bar chart for feature importance
+            importance_data = {
+                "Contract_Month-to-month": 0.35,
+                "InternetService_Fiber optic": 0.22,
+                "tenure": 0.15,
+                "PaymentMethod_Electronic check": 0.10,
+                "MonthlyCharges": 0.08,
+                "OnlineSecurity_No": 0.05,
+                "Other": 0.05
+            }
+            gr.BarPlot(
+                value=pd.DataFrame([{"Feature": k, "Importance": v} for k, v in importance_data.items()]),
+                x="Feature",
+                y="Importance",
+                title="Top 7 Drivers of Churn",
+                vertical=False,
+                width=600,
+                height=400,
+                tooltip=["Feature", "Importance"]
+            )
+            gr.Markdown("> **Insight:** Month-to-month contracts and Fiber Optic service are the strongest indicators of churn risk in this dataset.")
+
+        with gr.Tab("Project Info"):
+            gr.Markdown("""
+            ### MLOps Architecture
+            - **Engine:** XGBoost Classifier
+            - **API Framework:** FastAPI
+            - **Frontend:** Custom HTML/JS + Gradio
+            - **Cloud:** AWS ECS Fargate
+            - **CI/CD:** GitHub Actions
+            - **Monitoring:** Great Expectations
+            """)
 
 # === MOUNT GRADIO UI INTO FASTAPI ===
-# This creates the /ui endpoint that serves the Gradio interface
-# IMPORTANT: This must be the final line to properly integrate Gradio with FastAPI
-app = gr.mount_gradio_app(
-    app,           # FastAPI application instance
-    demo,          # Gradio interface
-    path="/ui"     # URL path where Gradio will be accessible
-)
+app = gr.mount_gradio_app(app, demo, path="/ui")

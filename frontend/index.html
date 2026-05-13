@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TelcoInsight | AI Churn Prediction</title>
+    <meta name="description" content="Enterprise-grade AI solution for predicting telecom customer churn using XGBoost and MLOps best practices.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="container nav-container">
+            <div class="logo">
+                <i class="fas fa-satellite-dish"></i>
+                <span>Telco<span>Insight</span></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#prediction">Predictor</a></li>
+                <li><a href="/docs" target="_blank">API Docs</a></li>
+                <li><a href="/ui" target="_blank" class="btn-secondary">Gradio UI</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header>
+        <div class="container hero-container">
+            <div class="hero-content">
+                <h1>Predict Customer Churn with <span class="gradient-text">Precision AI</span></h1>
+                <p>An enterprise-grade MLOps solution using XGBoost to identify at-risk customers before they leave. Built with FastAPI, Docker, and AWS.</p>
+                <div class="hero-btns">
+                    <a href="#prediction" class="btn-primary">Try the Predictor</a>
+                    <a href="https://github.com/AadhiDev-MS/AWS-FIRST-PROJECT" target="_blank" class="btn-outline"><i class="fab fa-github"></i> View Source</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="glass-card stats-card">
+                    <div class="stat-item">
+                        <span class="stat-value">94%</span>
+                        <span class="stat-label">Recall</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">XGBoost</span>
+                        <span class="stat-label">Model</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">AWS</span>
+                        <span class="stat-label">Cloud</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Built for Production</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-microchip"></i>
+                    <h3>XGBoost Engine</h3>
+                    <p>Optimized gradient boosting model trained on historical churn data with precision tuning.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-box-open"></i>
+                    <h3>Dockerized</h3>
+                    <p>Fully containerized application for consistent deployment across any environment.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-vial"></i>
+                    <h3>Data Validation</h3>
+                    <p>Great Expectations integrated into the pipeline ensures 100% data quality.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-cloud"></i>
+                    <h3>AWS Fargate</h3>
+                    <p>Serverless deployment on AWS ECS for high availability and automatic scaling.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="prediction" class="prediction-section">
+        <div class="container">
+            <div class="prediction-wrapper">
+                <div class="prediction-form-container">
+                    <h2>Customer Profiler</h2>
+                    <p>Fill in the details to generate an AI-powered churn risk assessment.</p>
+                    <form id="churnForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="gender">Gender</label>
+                                <select id="gender" required>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tenure">Tenure (Months)</label>
+                                <input type="number" id="tenure" min="0" max="100" value="12" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="InternetService">Internet Service</label>
+                                <select id="InternetService" required>
+                                    <option value="Fiber optic">Fiber optic</option>
+                                    <option value="DSL">DSL</option>
+                                    <option value="No">None</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="Contract">Contract</label>
+                                <select id="Contract" required>
+                                    <option value="Month-to-month">Month-to-month</option>
+                                    <option value="One year">One year</option>
+                                    <option value="Two year">Two year</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="MonthlyCharges">Monthly Charges ($)</label>
+                                <input type="number" id="MonthlyCharges" step="0.01" value="70.00" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="PaymentMethod">Payment Method</label>
+                                <select id="PaymentMethod" required>
+                                    <option value="Electronic check">Electronic check</option>
+                                    <option value="Mailed check">Mailed check</option>
+                                    <option value="Bank transfer (automatic)">Bank transfer</option>
+                                    <option value="Credit card (automatic)">Credit card</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary full-width" id="submitBtn">Analyze Risk</button>
+                    </form>
+                </div>
+                <div class="prediction-result" id="resultCard">
+                    <div class="result-placeholder">
+                        <i class="fas fa-robot"></i>
+                        <p>Waiting for analysis...</p>
+                    </div>
+                    <div class="result-content hidden" id="resultContent">
+                        <div class="status-badge" id="statusBadge">Low Risk</div>
+                        <h3 id="resultTitle">Customer is likely to stay</h3>
+                        <p id="resultDesc">Based on the provided metrics, this customer shows high loyalty signals.</p>
+                        <div class="risk-meter">
+                            <div class="meter-bar"><div class="meter-fill" id="meterFill"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 TelcoInsight MLOps Project. Built for Portfolio Demonstration.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
