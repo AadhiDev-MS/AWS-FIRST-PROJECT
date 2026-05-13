@@ -10,9 +10,9 @@
 ---
 
 ## 🚀 Live Demo
-- **Custom Landing Page:** [http://YOUR_AWS_IP:8000/](http://YOUR_AWS_IP:8000/)
-- **Gradio Intelligence UI:** [http://YOUR_AWS_IP:8000/ui](http://YOUR_AWS_IP:8000/ui)
-- **Interactive API Docs:** [http://YOUR_AWS_IP:8000/docs](http://YOUR_AWS_IP:8000/docs)
+- **Custom Landing Page:** [http://18.212.59.53:8000/](http://18.212.59.53:8000/)
+- **Gradio Intelligence UI:** [http://18.212.59.53:8000/ui](http://18.212.59.53:8000/ui)
+- **Interactive API Docs:** [http://18.212.59.53:8000/docs](http://18.212.59.53:8000/docs)
 
 ---
 
@@ -58,9 +58,10 @@ graph TD
 ## 📈 Model Performance
 | Metric | Score | Note |
 |--------|-------|------|
-| **Recall** | 94% | Optimized to minimize false negatives (missing at-risk customers) |
-| **Precision** | 82% | Balanced to ensure retention campaigns are cost-effective |
-| **F1-Score** | 0.87 | High overall harmonic mean for robust performance |
+| **Recall** | 82% | Optimized to catch as many true churners as possible |
+| **ROC AUC** | 0.84 | Excellent ability to distinguish between churners and retainers |
+| **F1-Score** | 0.61 | Harmonic mean of precision and recall |
+| **Precision** | 48% | Indicates the percentage of predicted churners who actually churned |
 
 ---
 
@@ -102,4 +103,4 @@ By identifying customers likely to churn with **94% Recall**, TelcoInsight allow
 
 ---
 
-*Developed by [Your Name] - [Your LinkedIn]*
+*Developed by [Aadhi Dev MS](https://www.linkedin.com/in/aadhidevms/)*
