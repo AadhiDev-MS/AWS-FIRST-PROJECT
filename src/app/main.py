@@ -160,7 +160,7 @@ def gradio_interface(
 
 # === GRADIO UI CONFIGURATION ===
 # Build comprehensive Gradio interface with all customer features
-with gr.Blocks(theme=gr.themes.Soft()) as demo:
+with gr.Blocks() as demo:
     gr.Markdown("# 🔮 Telco Customer Churn Intelligence")
     
     with gr.Tabs():
@@ -222,10 +222,9 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
             }
             gr.BarPlot(
                 value=pd.DataFrame([{"Feature": k, "Importance": v} for k, v in importance_data.items()]),
-                x="Feature",
-                y="Importance",
+                x="Importance",
+                y="Feature",
                 title="Top 7 Drivers of Churn",
-                vertical=False,
                 width=600,
                 height=400,
                 tooltip=["Feature", "Importance"]
