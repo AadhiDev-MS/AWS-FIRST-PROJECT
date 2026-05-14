@@ -220,14 +220,12 @@ with gr.Blocks() as demo:
                 "OnlineSecurity_No": 0.05,
                 "Other": 0.05
             }
+
             gr.BarPlot(
                 value=pd.DataFrame([{"Feature": k, "Importance": v} for k, v in importance_data.items()]),
                 x="Importance",
                 y="Feature",
-                title="Top 7 Drivers of Churn",
-                width=600,
-                height=400,
-                tooltip=["Feature", "Importance"]
+                title="Top 7 Drivers of Churn"
             )
             gr.Markdown("> **Insight:** Month-to-month contracts and Fiber Optic service are the strongest indicators of churn risk in this dataset.")
 
