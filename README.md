@@ -10,9 +10,9 @@
 ---
 
 ## 🚀 Live Demo
-- **Custom Landing Page:** [http://18.212.59.53:8000/](http://18.212.59.53:8000/)
-- **Gradio Intelligence UI:** [http://18.212.59.53:8000/ui](http://18.212.59.53:8000/ui)
-- **Interactive API Docs:** [http://18.212.59.53:8000/docs](http://18.212.59.53:8000/docs)
+- **Custom Landing Page:** [http://telco-churn-aadhi.duckdns.org:8000/](http://telco-churn-aadhi.duckdns.org:8000/)
+- **Gradio Intelligence UI:** [http://telco-churn-aadhi.duckdns.org:8000/ui](http://telco-churn-aadhi.duckdns.org:8000/ui)
+- **Interactive API Docs:** [http://telco-churn-aadhi.duckdns.org:8000/docs](http://telco-churn-aadhi.duckdns.org:8000/docs)
 
 ---
 
@@ -96,7 +96,7 @@ This project uses **Great Expectations** to ensure data integrity before inferen
 ---
 
 ## 💼 Business Impact
-By identifying customers likely to churn with **94% Recall**, TelcoInsight allows marketing teams to:
+By identifying customers likely to churn with **82% Recall**, TelcoInsight allows marketing teams to:
 1. **Reduce Churn Rate:** Proactively target high-risk users with personalized offers.
 2. **Maximize LTV:** Retain high-value customers on long-term contracts.
 3. **Optimize Spend:** Only send expensive retention offers to those truly at risk.
